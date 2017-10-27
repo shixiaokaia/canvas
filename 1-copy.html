@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <canvas></canvas>
+
+    <script>
+        var data = [{
+                x: 100,
+                y: 100
+            },
+            {
+                x: 200,
+                y: 120
+            },
+            {
+                x: 300,
+                y: 180
+            },
+            {
+                x: 400,
+                y: 300
+            },
+            {
+                x: 500,
+                y: 140
+            }
+        ]
+
+
+        var LineChart = function () {
+            this.canvas = document.querySelector('canvas');
+
+            this.canvas.width = 600;
+            this.canvas.height = 400;
+            this.canvas.style.border = '1px solid #ff0000';
+
+            this.context = this.canvas.getContext('2d');
+
+            this.width = this.canvas.width;
+            this.height = this.canvas.height;
+
+            this.space = 20;
+
+            this.zeroX = this.space;
+            this.zeroY = this.height - this.space;
+
+            this.arrow = 10;
+            this.square = 8;
+
+
+        }
+
+
+        LineChart.prototype.drawAxis = function () {
+
+            this.context.beginPath();
+            this.context.moveTo(this.zeroX, this.zeroY);
+            this.context.lineTo(this.width - this.space, this.zeroY);
+            this.context.lineTo(this.width - this.space - this.arrow, this.height - this.space + this.arrow / 2);
+            this.context.lineTo(this.width - this.space - this.arrow, this.height - this.space - this.arrow / 2);
+            this.context.lineTo(this.width - this.space, this.zeroY);
+            // 画线
+            this.context.stroke();
+            this.context.fill();
+
+
+
+            // Y轴
+            this.context.beginPath();
+            // 把画笔移动到坐标原点
+            this.context.moveTo(this.zeroX, this.zeroY);
+            // 画一条X轴
+            this.context.lineTo(this.zeroX, this.space);
+            this.context.lineTo(this.space - this.arrow / 2, this.space + this.arrow);
+            this.context.lineTo(this.space + this.arrow / 2, this.space + this.arrow);
+            this.context.lineTo(this.zeroX, this.space);
+            // 画线
+            this.context.stroke();
+            this.context.fill();
+        }
+
+        LineChart.prototype.drawSquare=function(){
+            this.context.beginPath();
+            this.context.moveTo(data.x-this.square/2,data.y - this.square/2);
+            this.context.fillRect(data.x-this.square/2,data.y - this.square/2,this.square,this.square);
+        }
+
+        LineChart.prototype.transform=function(){
+            var _this=this;
+            var canvasData = [];
+            data.forEach(function(item,i){
+
+                canvasData.push({
+                    x:_this.zeroX+item.x,
+                    y:_this.zeroY-item.y
+                })
+            })
+
+            return canvasData;
+        }
+
+
+        LineChart.prototype.drawDots=function(){
+            var _this=this;
+            var canvasData=this.transform(data);
+
+            canvasData.forEach(function(item,i){
+
+                _this.drawSquare(item);
+
+                if (i==0) {
+                    _this.drawLine(_this.zeroX,_this.zeroY,item.x,item.y);
+                }else{
+                    _this.drawLine(canvasData[i-1].x,canvasData[i-1].y,item.x,item.y);
+                }
+            })
+        }
+
+        LineChart.prototype.drawLine=function(startX,startY,endX,endY){
+            this.context.beginPath();
+            this.context.moveTo(startX,startY);
+            this.context.lineTo(endX,endY);
+            this.context.stroke();
+        }
+
+
+        LineChart.prototype.init=function(){
+            this.drawAxis();
+            this.drawDots(data);
+        }
+
+        new LineChart().init();
+    </script>
+</body>
+
+</html>
